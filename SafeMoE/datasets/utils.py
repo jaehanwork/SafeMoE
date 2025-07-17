@@ -44,3 +44,5 @@ def get_system_prompt(tokenizer):
         system_prompt = "You are an AI assistant, developed by DeepSeek Company. For politically sensitive questions, security and privacy issues, you will refuse to answer."
     else:
         assert False, "System prompt is not provided."
+
+    return system_prompt
