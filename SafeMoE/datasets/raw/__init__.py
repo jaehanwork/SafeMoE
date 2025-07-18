@@ -19,3 +19,5 @@ from SafeMoE.datasets.raw.samsum import *
 from SafeMoE.datasets.raw.safe_snip import *
 from SafeMoE.datasets.raw.safe_llama import *
 from SafeMoE.datasets.raw.safe_olmoe import *
+from SafeMoE.datasets.raw.cheat import *
+from SafeMoE.datasets.raw.gms8k import *

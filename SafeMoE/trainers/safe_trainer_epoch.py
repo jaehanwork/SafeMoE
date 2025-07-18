@@ -513,6 +513,16 @@ class SafeEpochTrainer(Trainer):
             self._evaluate(trial, ignore_keys_for_eval, skip_scheduler=True)
 
         for epoch in range(epochs_trained, num_train_epochs):
+            
+            # for name, param in model.named_parameters():
+            #     if 'mlp.gate.lora' in name:
+            #         param.requires_grad = False
+            #     elif 'lora' in name:
+            #         param.requires_grad = True
+            #     else:
+            #         param.requires_grad = False
+            # model._orig_mod.module.print_trainable_parameters()
+
             epoch_dataloader = train_dataloader
             if hasattr(epoch_dataloader, "set_epoch"):
                 epoch_dataloader.set_epoch(epoch)
@@ -726,6 +736,13 @@ class SafeEpochTrainer(Trainer):
             safe_outputs = None
             safe_routing_logits = None
 
+            # for name, param in model.named_parameters():
+            #     if 'lora' in name:
+            #         param.requires_grad = True
+            #     else:
+            #         param.requires_grad = False
+            # model._orig_mod.module.print_trainable_parameters()
+
             
             # iterate over the safe dataset by batch with args.per_device_train_batch_size
             for start in tqdm(range(0, len(self.safe_dataset), self.args.per_device_train_batch_size), desc="Safe Training Batches"):
@@ -787,6 +804,8 @@ class SafeEpochTrainer(Trainer):
                 # logging routing_loss
                 if is_main_process():
                     self.log({"routing_loss": routing_loss.item()})
+
+                
 
             if self.control.should_training_stop:
                 break

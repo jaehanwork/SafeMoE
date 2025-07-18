@@ -37,7 +37,7 @@ def get_system_prompt(tokenizer):
     if 'olmoe' in tokenizer.name_or_path.lower():
         system_prompt = "You are OLMo 2, a helpful and harmless AI Assistant built by the Allen Institute for AI."
     elif 'llama' in tokenizer.name_or_path.lower():
-        system_prompt = None
+        system_prompt = "You are an expert conversationalist who responds to the best of your ability. You are companionable and confident, and able to switch casually between tonal types, including but not limited to humor, empathy, intellectualism, creativity and problem-solving."
     elif 'qwen3' in tokenizer.name_or_path.lower():
         system_prompt = None
     elif 'deepseek' in tokenizer.name_or_path.lower():

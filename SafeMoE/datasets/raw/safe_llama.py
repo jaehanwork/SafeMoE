@@ -5,7 +5,7 @@ import json
 
 __all__ = ['SafeLLAMADataset', 'SafeLLAMATrain10Dataset', 'SafeLLAMATrain50Dataset', 'SafeLLAMATrain100Dataset', 'SafeLLAMATrain500Dataset', 'SafeLLAMAInstructionTrain100Dataset']
 
-safe_path = '/root/SafeMoE/SafeMoE/datasets/raw/safety_only_data_Instructions.json'
+safe_path = '/root/SafeMoE/SafeMoE/datasets/raw/raw_data/safety_only_data_Instructions.json'
 
 class SafeLLAMADataset(RawDataset):
     NAME: str = 'safe-llama'
