@@ -32,7 +32,7 @@ while [[ "$#" -gt 0 ]]; do
 	esac
 done
 
-python SafeMoE/eval/gsm8k/generate_lora.py \
+python SafeMoE/eval/MMLU-Pro/generate_lora.py \
 	--model_name_or_path "${MODEL_NAME_OR_PATH}" \
 	--enable_lora "${ENABLE_LORA}" \
 	--output_dir "${OUTPUT_DIR}"

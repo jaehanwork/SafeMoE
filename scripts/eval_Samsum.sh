@@ -6,8 +6,8 @@ export PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}"
 export LOGLEVEL="${LOGLEVEL:-WARNING}"
 
 MODEL_NAME_OR_PATH=""
-EXPERT_DIR=""
 OUTPUT_DIR=""
+ENABLE_LORA=True
 
 while [[ "$#" -gt 0 ]]; do
 	arg="$1"
@@ -17,9 +17,9 @@ while [[ "$#" -gt 0 ]]; do
 			MODEL_NAME_OR_PATH="$1"
 			shift
 			;;
-        --expert_dir)
-			EXPERT_DIR="$1"
-            shift
+		--enable_lora)
+			ENABLE_LORA="$1"
+			shift
 			;;
 		--output_dir)
 			OUTPUT_DIR="$1"
@@ -34,4 +34,5 @@ done
 
 python SafeMoE/eval/Samsum/generate_lora.py \
 	--model_name_or_path "${MODEL_NAME_OR_PATH}" \
+	--enable_lora "${ENABLE_LORA}" \
 	--output_dir "${OUTPUT_DIR}"

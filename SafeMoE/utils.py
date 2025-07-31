@@ -270,3 +270,15 @@ def get_optimizer_grouped_parameters(
             'weight_decay': 0.0,
         },
     ]
+
+def get_base_model_name(model_name_or_path):
+    if "OLMoE-1B-7B-0125-Instruct" in model_name_or_path or "olmoe" in model_name_or_path.lower():
+        base_model_name = "allenai/OLMoE-1B-7B-0125-Instruct"
+    elif 'qwen1.5' in model_name_or_path.lower():
+        base_model_name = "Qwen/Qwen1.5-MoE-A2.7B-Chat"
+    elif 'qwen3' in model_name_or_path.lower():
+        base_model_name = "Qwen/Qwen3-30B-A3B"
+    elif 'deepseek' in model_name_or_path.lower():
+        base_model_name = "deepseek-ai/DeepSeek-V2-Lite-Chat"
+    
+    return base_model_name

@@ -20,7 +20,7 @@ def main() -> None:
     eval_model = "meta-llama/Llama-Guard-4-12B"
     tokenizer = AutoTokenizer.from_pretrained(eval_model)
 
-    llm = LLM(model=eval_model, task='generate', tensor_parallel_size=torch.cuda.device_count(), max_model_len=4096)
+    llm = LLM(model=eval_model, task='generate', tensor_parallel_size=1, max_model_len=4096)
 
     def apply_template(batch):
         if eval_model == "meta-llama/Llama-Guard-4-12B":

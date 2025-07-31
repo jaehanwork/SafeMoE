@@ -10,6 +10,8 @@ OUTPUT_DIR=""
 TRAIN_DATASETS=()
 ROUTING_LOGITS_SAFE=""
 TEMP=1.0
+RANK=8
+ALPHA=8
 EPOCHS=3
 TOPK=None
 
@@ -23,6 +25,14 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         --epochs)
             EPOCHS="$1"
+            shift
+            ;;
+        --rank)
+            RANK="$1"
+            shift
+            ;;
+        --alpha)
+            ALPHA="$1"
             shift
             ;;
         --train_datasets)
@@ -76,13 +86,15 @@ accelerate launch --config_file config/new_config.yaml \
 SafeMoE/training/lora_safe_epoch.py \
     --train_datasets ${TRAIN_DATASETS[@]} \
 	--model_name_or_path "${MODEL_NAME_OR_PATH}" \
+    --rank "${RANK}" \
+    --alpha "${ALPHA}" \
     --do_train True \
     --logging_steps 1 \
 	--max_length 512 \
     --temp "${TEMP}" \
 	--num_train_epochs "${EPOCHS}" \
-	--per_device_train_batch_size 32 \
-    --gradient_accumulation_steps 1 \
+	--per_device_train_batch_size 8 \
+    --gradient_accumulation_steps 2 \
     --gradient_checkpointing False \
 	--learning_rate 1e-4 \
 	--lr_scheduler_type cosine \

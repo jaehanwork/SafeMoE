@@ -9,10 +9,12 @@ from tqdm import tqdm
 from pdb import set_trace
 import json
 from SafeMoE.datasets.utils import get_system_prompt
-from peft import PeftConfig, load_peft_weights
+from SafeMoE.utils import get_base_model_name, str2bool
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model_name_or_path", type=str, required=True)
+parser.add_argument("--enable_lora", type=str2bool, default=True)
 parser.add_argument("--output_dir", type=str, required=True)
 args = parser.parse_args()
 
@@ -21,27 +23,43 @@ def main() -> None:
     output_dir = args.output_dir
     os.makedirs(output_dir, exist_ok=True)
 
-    if "OLMoE-1B-7B-0125-Instruct" in model_name or "olmoe" in model_name.lower():
-        base_model_name = "allenai/OLMoE-1B-7B-0125-Instruct"
-    else:
-        assert "not supported model name"
+    base_model_name = get_base_model_name(model_name)
+    print(f"Base model: {base_model_name}")
 
+    print("Enable LoRA:", args.enable_lora)
+        
     tokenizer = AutoTokenizer.from_pretrained(base_model_name)
-    llm = LLM(model=base_model_name, task='generate', tensor_parallel_size=torch.cuda.device_count(), enable_lora=True)
-
+    # Try to avoid the compilation issue by disabling torch.compile and using safer settings
+    llm = LLM(
+        model=base_model_name, 
+        task='generate', 
+        tensor_parallel_size=1,  # Try with single GPU first
+        enable_lora=args.enable_lora,
+        max_model_len=4096,  # Set a reasonable max length
+        trust_remote_code=True,
+        disable_custom_all_reduce=True,  # Disable custom all reduce
+        enforce_eager=True,  # Disable torch.compile
+        disable_log_stats=True  # Disable logging stats
+    )
+    
     dataset = load_dataset("JailbreakBench/JBB-Behaviors", "behaviors")["harmful"]
     text_key = "Goal"
 
+    system_prompt = get_system_prompt(tokenizer)
+
+
     def apply_template(batch):
         # Construct OpenAI-style message format
-        system_prompt = get_system_prompt(tokenizer)
-
-        messages = [
-            [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt}] 
-                for prompt in batch[text_key]
-        ]
+        
+        messages = []
+        for prompt in batch[text_key]:
+            if system_prompt:
+                messages.append([
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt}
+                ])
+            else:
+                messages.append([{"role": "user", "content": prompt}])
         
         # Apply chat template and tokenize
         formatted = [
@@ -53,17 +71,12 @@ def main() -> None:
 
     total = len(dataset)
 
-    if tokenizer.chat_template:
-        formatted = dataset.map(apply_template, batched=True)['prompt']
-    else:
-        formatted = dataset[text_key]
-
+    formatted = dataset.map(apply_template, batched=True)['prompt']
     print(formatted[0])
 
-
     sampling_params = SamplingParams(
-        temperature=0.0,  # deterministic
-        max_tokens=512,     # no generation, if you're just encoding
+        temperature=0.0,
+        max_tokens=1024,
     )
 
     batch_size = 128
@@ -72,7 +85,7 @@ def main() -> None:
     formatted_prompts = []
     for i in range(0, len(formatted), batch_size):
         batch = formatted[i:i+batch_size]
-        outputs = llm.generate(batch, sampling_params, lora_request=LoRARequest("lora", 1, model_name))
+        outputs = llm.generate(batch, sampling_params, lora_request=LoRARequest("lora", 1, model_name) if args.enable_lora else None)
         results.extend([o.outputs[0].text for o in outputs])
         formatted_prompts.extend([o.prompt for o in outputs])
 

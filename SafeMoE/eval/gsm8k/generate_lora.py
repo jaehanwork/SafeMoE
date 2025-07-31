@@ -12,6 +12,7 @@ from datasets import load_dataset
 
 from grader import math_equal
 from util import last_boxed_only_string
+from SafeMoE.utils import get_base_model_name, str2bool
 
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -53,6 +54,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_name_or_path", type=str, required=True)
     parser.add_argument("--output_dir", type=str, required=True)
+    parser.add_argument("--enable_lora", type=str2bool, default=True)
     parser.add_argument("--skip_generation", type=bool, default=False)
     args = parser.parse_args()
 
@@ -62,15 +64,18 @@ def main() -> None:
 
     if not args.skip_generation:
         # Determine base model name
-        if "OLMoE-1B-7B-0125-Instruct" in model_name or "olmoe" in model_name.lower():
-            base_model_name = "allenai/OLMoE-1B-7B-0125-Instruct"
-            
+        base_model_name = get_base_model_name(model_name)
+        print(f"Base model: {base_model_name}")
+
         tokenizer = AutoTokenizer.from_pretrained(base_model_name)
+        # Try to avoid the compilation issue by disabling torch.compile and using safer settings
         llm = LLM(
             model=base_model_name, 
             task='generate', 
-            tensor_parallel_size=torch.cuda.device_count(), 
-            enable_lora=True
+            tensor_parallel_size=1,  # Try with single GPU first
+            enable_lora=args.enable_lora,
+            max_model_len=4096,  # Set a reasonable max length
+            trust_remote_code=True
         )
         
         # Load GSM8K dataset
@@ -117,7 +122,7 @@ def main() -> None:
             max_tokens=512,  # Longer response needed for math reasoning
         )
         
-        batch_size = 64
+        batch_size = 2048
         questions = eval_dataset[instruction_key]
         results = []
         formatted_prompt_outputs = []
@@ -128,7 +133,7 @@ def main() -> None:
             
             # Check if we need LoRA request (when model_name differs from base_model_name)
             if model_name != base_model_name:
-                outputs = llm.generate(batch, sampling_params, lora_request=LoRARequest("lora", 1, model_name))
+                outputs = llm.generate(batch, sampling_params, lora_request=LoRARequest("lora", 1, model_name) if args.enable_lora else None)
             else:
                 outputs = llm.generate(batch, sampling_params)
                 
@@ -144,6 +149,12 @@ def main() -> None:
                            and not result.strip().endswith('?')
                            and not ']' in result[-10:] for result in results]
         
+        # Check if predictions are correct
+        is_correct_list = [
+            math_equal(str(p), str(ta)) if p is not None else False
+            for p, ta in zip(predictions, true_answers)
+        ]
+        
         results_out = [
             {
                 "prompt": q, 
@@ -151,10 +162,11 @@ def main() -> None:
                 "completion": r, 
                 "extracted_answer": p,
                 "true_answer": ta,
-                "is_truncated": it
+                "is_truncated": it,
+                "is_correct": ic
             } 
-            for q, r, fp, p, ta, it in zip(questions, results, formatted_prompt_outputs, 
-                                          predictions, true_answers, is_truncated_list, strict=True)
+            for q, r, fp, p, ta, it, ic in zip(questions, results, formatted_prompt_outputs, 
+                                              predictions, true_answers, is_truncated_list, is_correct_list, strict=True)
         ]
         
         save_path = os.path.join(output_dir, "generated_outputs.json")
@@ -166,6 +178,23 @@ def main() -> None:
         save_path = os.path.join(output_dir, "generated_outputs.json")
         with open(save_path, "r") as f:
             results_out = json.load(f)
+
+        # Add or update is_correct field for all results
+        updated = False
+        for result in results_out:
+            pred = result.get('extracted_answer')
+            true_ans = result.get('true_answer')
+            is_correct = math_equal(str(pred), str(true_ans)) if pred is not None else False
+            
+            if 'is_correct' not in result or result['is_correct'] != is_correct:
+                result['is_correct'] = is_correct
+                updated = True
+        
+        # Save updated results back to file if any changes were made
+        if updated:
+            with open(save_path, "w") as f:
+                json.dump(results_out, f, indent=4)
+            print(f"Updated generated_outputs.json with correctness information")
 
         predictions = [r['extracted_answer'] for r in results_out]
         true_answers = [r['true_answer'] for r in results_out]

@@ -745,13 +745,14 @@ class SafeEpochTrainer(Trainer):
 
             
             # iterate over the safe dataset by batch with args.per_device_train_batch_size
-            for start in tqdm(range(0, len(self.safe_dataset), self.args.per_device_train_batch_size), desc="Safe Training Batches"):
-                end = start + self.args.per_device_train_batch_size
+            safe_batch_size = self.args.per_device_train_batch_size * self.args.gradient_accumulation_steps
+            for start in tqdm(range(0, len(self.safe_dataset), safe_batch_size), desc="Safe Training Batches"):
+                end = start + safe_batch_size
                 if end > len(self.safe_dataset):
                     end = len(self.safe_dataset)
             
             
-                input_ids = right_padding([self.safe_dataset[i]["input_ids"] for i in range(start, end)], padding_value=self.processing_class.pad_token_id).to(self.args.device)
+                input_ids = right_padding([self.safe_dataset[i]["input_ids"] for i in range(start, end)], padding_value=self.processing_class.pad_token_id, max_length=None).to(self.args.device)
                 safe_attention_mask = input_ids.ne(self.processing_class.pad_token_id).to(torch.long).to(self.args.device)
                 
                 # Forward pass

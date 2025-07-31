@@ -21,3 +21,5 @@ from SafeMoE.datasets.raw.safe_llama import *
 from SafeMoE.datasets.raw.safe_olmoe import *
 from SafeMoE.datasets.raw.cheat import *
 from SafeMoE.datasets.raw.gms8k import *
+from SafeMoE.datasets.raw.pubmedqa import *
+from SafeMoE.datasets.raw.sql import *

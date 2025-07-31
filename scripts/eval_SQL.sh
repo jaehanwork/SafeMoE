@@ -17,7 +17,7 @@ while [[ "$#" -gt 0 ]]; do
 			MODEL_NAME_OR_PATH="$1"
 			shift
 			;;
-        --enable_lora)
+		--enable_lora)
 			ENABLE_LORA="$1"
 			shift
 			;;
@@ -32,7 +32,7 @@ while [[ "$#" -gt 0 ]]; do
 	esac
 done
 
-python SafeMoE/eval/gsm8k/generate_lora.py \
+python SafeMoE/eval/SQL/generate_lora.py \
 	--model_name_or_path "${MODEL_NAME_OR_PATH}" \
 	--enable_lora "${ENABLE_LORA}" \
 	--output_dir "${OUTPUT_DIR}"

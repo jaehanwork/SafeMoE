@@ -6,8 +6,9 @@ export PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}"
 export LOGLEVEL="${LOGLEVEL:-WARNING}"
 
 MODEL_NAME_OR_PATH=""
+EXPERT_DIR=""
 OUTPUT_DIR=""
-ENABLE_LORA=True
+SAMPLE_SIZE=100
 
 while [[ "$#" -gt 0 ]]; do
 	arg="$1"
@@ -17,8 +18,8 @@ while [[ "$#" -gt 0 ]]; do
 			MODEL_NAME_OR_PATH="$1"
 			shift
 			;;
-        --enable_lora)
-			ENABLE_LORA="$1"
+		--sample_size)
+			SAMPLE_SIZE="$1"
 			shift
 			;;
 		--output_dir)
@@ -32,7 +33,7 @@ while [[ "$#" -gt 0 ]]; do
 	esac
 done
 
-python SafeMoE/eval/gsm8k/generate_lora.py \
+python SafeMoE/eval/router_logits/extract_routing_logits_lora.py \
 	--model_name_or_path "${MODEL_NAME_OR_PATH}" \
-	--enable_lora "${ENABLE_LORA}" \
+	--sample_size "${SAMPLE_SIZE}" \
 	--output_dir "${OUTPUT_DIR}"

@@ -49,6 +49,18 @@ def parse_arguments() -> argparse.Namespace:
         type=int,
         default=None,
     )
+    model_parser.add_argument(
+        '--rank',
+        type=int,
+        default=8,
+        help='The rank of the LoRA layers.',
+    )
+    model_parser.add_argument(
+        '--alpha',
+        type=int,
+        default=8,
+        help='The alpha of the LoRA layers.',
+    )
 
 
     # Dataset
@@ -244,10 +256,22 @@ def main() -> None:
             trust_remote_code=True,
         )
 
+    if 'qwen' in args.model_name_or_path.lower():
+        target_modules = ["q_proj", "v_proj", "k_proj", "o_proj"]
+        lora_alpha = 32
+    elif 'deepseek' in args.model_name_or_path.lower():
+        target_modules = ["q_proj", "kv_a_proj_with_mqa", "kv_b_proj", "o_proj"]
+        lora_alpha = 32
+    else:
+        target_modules = ["q_proj", "v_proj"]
+        lora_alpha = args.alpha
+
+    print(f"Lora alpha: {lora_alpha}, Target modules: {target_modules}")
+    
     lora_config = LoraConfig(
-        r=8,
-        target_modules=["q_proj", "v_proj"],
-        lora_dropout=0.1
+        r=args.rank,
+        lora_alpha=lora_alpha,
+        target_modules=target_modules,
     )
 
     model = get_peft_model(base_model, lora_config)

@@ -23,14 +23,25 @@ def format_prompt(prompts, tokenizer) -> str:
     return prompt 
     
 
-def right_padding(sequences: list[torch.Tensor], padding_value: Number) -> torch.Tensor:
-    return pad_sequence(sequences, batch_first=True, padding_value=padding_value)
+def right_padding(sequences: list[torch.Tensor], padding_value: Number, max_length: int = 512) -> torch.Tensor:
+    padded = pad_sequence(sequences, batch_first=True, padding_value=padding_value)
+    if max_length is not None:
+        current_length = padded.size(1)
+        if current_length < max_length:
+            # Need to pad further to reach max_length
+            pad_width = max_length - current_length
+            padded = torch.nn.functional.pad(padded, (0, pad_width), value=padding_value)
+        elif current_length > max_length:
+            # Truncate if longer than max_length
+            padded = padded[:, :max_length]
+    return padded
 
 
-def left_padding(sequences: list[torch.Tensor], padding_value: Number) -> torch.Tensor:
+def left_padding(sequences: list[torch.Tensor], padding_value: Number, max_length: int = None) -> torch.Tensor:
     return right_padding(
         [seq.flip(0) for seq in sequences],
         padding_value=padding_value,
+        max_length=max_length,
     ).flip(1)
 
 def get_system_prompt(tokenizer):   
@@ -38,8 +49,8 @@ def get_system_prompt(tokenizer):
         system_prompt = "You are OLMo 2, a helpful and harmless AI Assistant built by the Allen Institute for AI."
     elif 'llama' in tokenizer.name_or_path.lower():
         system_prompt = "You are an expert conversationalist who responds to the best of your ability. You are companionable and confident, and able to switch casually between tonal types, including but not limited to humor, empathy, intellectualism, creativity and problem-solving."
-    elif 'qwen3' in tokenizer.name_or_path.lower():
-        system_prompt = None
+    elif 'qwen' in tokenizer.name_or_path.lower():
+        system_prompt = "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."
     elif 'deepseek' in tokenizer.name_or_path.lower():
         system_prompt = "You are an AI assistant, developed by DeepSeek Company. For politically sensitive questions, security and privacy issues, you will refuse to answer."
     else:

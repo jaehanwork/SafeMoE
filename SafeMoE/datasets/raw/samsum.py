@@ -4,7 +4,7 @@ from datasets import load_dataset, concatenate_datasets
 from SafeMoE.datasets.base import RawDataset, RawSample
 
 
-__all__ = ['SamsumDataset', 'SamsumTrainDataset', 'SamsumTrain10Dataset', 'SamsumTrain1kDataset', 'SamsumTrain5kDataset']
+__all__ = ['SamsumDataset', 'SamsumTrainDataset', 'SamsumTrain32Dataset', 'SamsumTrain1kDataset', 'SamsumTrain5kDataset']
 
 
 class SamsumDataset(RawDataset):
@@ -37,14 +37,14 @@ class SamsumTrainDataset(SamsumDataset):
     def __init__(self, path: str | None = None) -> None:
         super().__init__()
 
-class SamsumTrain10Dataset(SamsumDataset):
-    NAME: str = 'Samsum/train_10'
+class SamsumTrain32Dataset(SamsumDataset):
+    NAME: str = 'Samsum/train_32'
     SPLIT: str = 'train'
 
     def __init__(self, path: str | None = None) -> None:
         self.data = load_dataset('knkarthick/samsum', split=self.SPLIT)
         self.data = self.data.filter(lambda x: x["dialogue"])
-        self.data = self.data.select(range(10))
+        self.data = self.data.select(range(32))
 
         print('=============================')
         print(f'{self.NAME} {len(self.data)}')

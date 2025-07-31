@@ -6,6 +6,7 @@ from SafeMoE.datasets.base import RawDataset, RawSample
 
 __all__ = ['BeaverTailsDataset', 
            'BeaverTailsTrain1kDataset', 
+            'BeaverTailsTrain32Dataset',
            'BeaverTailsTrain100Dataset', 
            'BeaverTailsTrain200Dataset', 
            'BeaverTailsTrain500Dataset']
@@ -80,6 +81,19 @@ class BeaverTailsTrain100Dataset(BeaverTailsDataset):
         self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
         self.data = self.data.filter(lambda x: x["is_safe"] == False)
         self.data = self.data.select(range(100))
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+class BeaverTailsTrain32Dataset(BeaverTailsDataset):
+    NAME: str = 'BeaverTails/train_32'
+    SPLIT: str = '330k_train'
+
+    def __init__(self, path: str | None = None) -> None:
+        self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
+        self.data = self.data.filter(lambda x: x["is_safe"] == False)
+        self.data = self.data.select(range(32))
 
         print('=============================')
         print(f'{self.NAME} {len(self.data)}')

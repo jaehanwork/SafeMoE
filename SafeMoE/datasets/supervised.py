@@ -63,6 +63,9 @@ class SupervisedDataset(TokenizedDataset):
             prompts.append({'role': 'user', 'content': raw_sample['input']})
 
             answer = raw_sample['answer']
+            # if 'qwen3' in self.tokenizer.name_or_path.lower():
+            #     prompt = self.tokenizer.apply_chat_template(prompts, tokenize=False, add_generation_prompt=True, enable_thinking=False)
+            # else:
             prompt = self.tokenizer.apply_chat_template(prompts, tokenize=False, add_generation_prompt=True)
             if answer is not None:
                 text = prompt + answer + self.tokenizer.eos_token

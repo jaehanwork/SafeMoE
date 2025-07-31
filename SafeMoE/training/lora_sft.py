@@ -36,6 +36,18 @@ def parse_arguments() -> argparse.Namespace:
         default=512,
         help='The maximum sequence length of the model.',
     )
+    model_parser.add_argument(
+        '--rank',
+        type=int,
+        default=8,
+        help='The rank of the LoRA layers.',
+    )
+    model_parser.add_argument(
+        '--alpha',
+        type=int,
+        default=8,
+        help='The alpha of the LoRA layers.',
+    )
 
     # Dataset
     dataset_parser = parser.add_argument_group('dataset')
@@ -224,11 +236,25 @@ def main() -> None:
             trust_remote_code=True,
             dtype=torch.bfloat16,
         )
+    
+
+    if 'qwen' in args.model_name_or_path.lower():
+        target_modules = ["q_proj", "v_proj", "k_proj", "o_proj"]
+        lora_alpha = 32
+    elif 'deepseek' in args.model_name_or_path.lower():
+        target_modules = ["q_proj", "kv_a_proj_with_mqa", "kv_b_proj", "o_proj"]
+        lora_alpha = 32
+    else:
+        target_modules = ["q_proj", "v_proj"]
+        lora_alpha = args.alpha
+
+    print(f"Lora alpha: {lora_alpha}, Target modules: {target_modules}")
 
     lora_config = LoraConfig(
-        r=8,
-        target_modules=["q_proj", "v_proj"],
-        lora_dropout=0.1
+        r=args.rank,
+        lora_alpha=lora_alpha,
+        target_modules=target_modules,
+        inference_mode=False,
     )
 
     model = get_peft_model(base_model, lora_config)
@@ -259,6 +285,7 @@ def main() -> None:
         per_device_eval_batch_size=args.per_device_eval_batch_size,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
         gradient_checkpointing=args.gradient_checkpointing,
+        gradient_checkpointing_kwargs={"use_reentrant": False},
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
         warmup_ratio=args.warmup_ratio,
