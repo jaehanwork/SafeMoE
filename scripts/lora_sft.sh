@@ -77,8 +77,8 @@ SafeMoE/training/lora_sft.py \
     --logging_steps 1 \
 	--max_length 512 \
 	--num_train_epochs "${EPOCHS}" \
-	--per_device_train_batch_size 8 \
-    --gradient_accumulation_steps 2 \
+	--per_device_train_batch_size 1 \
+    --gradient_accumulation_steps 8 \
     --gradient_checkpointing False \
 	--learning_rate 1e-4 \
 	--lr_scheduler_type cosine \

@@ -56,17 +56,16 @@ def main() -> None:
         tokenizer = AutoTokenizer.from_pretrained(base_model_name)
         llm = LLM(model=base_model_name, task='generate', tensor_parallel_size=torch.cuda.device_count(), enable_lora=args.enable_lora)
         
-        dataset = load_dataset('TIGER-Lab/MMLU-Pro', split='test')
-        dataset = dataset.shuffle(seed=42).select(range(1000))
+        dataset = load_dataset('meta-llama/Llama-3.1-70B-Instruct-evals', name='Llama-3.1-70B-Instruct-evals__gpqa__details', split='latest')
         
         def apply_template(batch):
             # Construct OpenAI-style message format for MMLU-Pro
             messages = []
-            for question, options in zip(batch['question'], batch['options']):
+            for question, options in zip(batch['input_question'], batch['input_choice_list']):
                 # Format options as A) option1, B) option2, etc.
                 option_text = ""
-                for i, option in enumerate(options):
-                    letter = chr(ord('A') + i)
+                for letter in ["A", "B", "C", "D"]:
+                    option = options[letter]
                     option_text += f"{letter}. {option}\n"
                 
                 prompt = f"Given the following question and four candidate answers (A, B, C and D), choose the best answer.\n\nQuestion: {question}\n{option_text}\n- For simple problems:\nDirectly provide the answer with minimal explanation.\n\n- For complex problems:\nUse this step-by-step format:\n## Step 1: [Concise description]\n[Brief explanation]\n## Step 2: [Concise description]\n[Brief explanation]\n\nRegardless of the approach, always conclude with:\nThe best answer is [the_answer_letter].\nwhere the [the_answer_letter] is one of A, B, C or D.\n\n"
@@ -89,7 +88,7 @@ def main() -> None:
         total = len(dataset)
         
         formatted = dataset.map(apply_template, batched=True)['prompt']
-        correct_answers = dataset['answer']
+        correct_answers = [d[0] for d in dataset['input_correct_responses']]
         
         print(formatted[0])
         
@@ -100,7 +99,7 @@ def main() -> None:
         )
         
         batch_size = 1024
-        questions = dataset['question']
+        questions = dataset['input_question']
         results = []
         formatted_prompts = []
         for i in range(0, len(formatted), batch_size):

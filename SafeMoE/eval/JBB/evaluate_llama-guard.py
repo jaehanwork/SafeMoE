@@ -65,7 +65,7 @@ def main() -> None:
         max_tokens=10,     # no generation, if you're just encoding
     )
 
-    batch_size = 64
+    batch_size = 128
 
     unsafe_count = 0
     results = []

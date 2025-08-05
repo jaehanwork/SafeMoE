@@ -10,6 +10,7 @@ from tqdm import tqdm
 import json
 
 from SafeMoE.datasets.utils import get_system_prompt
+from SafeMoE.models.modeling_deepseek import DeepseekV2Model
 
 from pdb import set_trace
 
@@ -35,7 +36,10 @@ device = accelerator.device
 
 # Load model and tokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModel.from_pretrained(model_name, torch_dtype=torch.bfloat16)
+if "deepseek" in model_name.lower():
+    model = DeepseekV2Model.from_pretrained(model_name, torch_dtype=torch.bfloat16, trust_remote_code=True)
+else:
+    model = AutoModel.from_pretrained(model_name, torch_dtype=torch.bfloat16)
 
 
 with open('/root/SafeMoE/SafeMoE/datasets/raw/raw_data/safety_only_data_Instructions.json', 'r') as f:

@@ -93,8 +93,8 @@ SafeMoE/training/lora_safe_epoch.py \
 	--max_length 512 \
     --temp "${TEMP}" \
 	--num_train_epochs "${EPOCHS}" \
-	--per_device_train_batch_size 8 \
-    --gradient_accumulation_steps 2 \
+	--per_device_train_batch_size 2 \
+    --gradient_accumulation_steps 4 \
     --gradient_checkpointing False \
 	--learning_rate 1e-4 \
 	--lr_scheduler_type cosine \

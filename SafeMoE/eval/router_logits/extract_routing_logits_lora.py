@@ -11,6 +11,7 @@ import json
 from peft import PeftModel
 
 from SafeMoE.datasets.utils import get_system_prompt
+from SafeMoE.models.modeling_deepseek import DeepseekV2ForCausalLM
 
 from pdb import set_trace
 
@@ -40,12 +41,15 @@ elif 'qwen' in model_name.lower():
     base_model_name = "Qwen/Qwen3-30B-A3B"
 elif 'qwen1.5' in model_name.lower():
     base_model_name = "Qwen/Qwen1.5-MoE-A2.7B-Chat"
+elif 'deepseek' in model_name.lower():
+    base_model_name = "deepseek-ai/DeepSeek-V2-Lite-Chat"
 else:
     assert "not supported model name"
 
 print(f"Base model: {base_model_name}")
 
-base_model = AutoModelForCausalLM.from_pretrained(
+if base_model_name == "deepseek-ai/DeepSeek-V2-Lite-Chat":
+    base_model = DeepseekV2ForCausalLM.from_pretrained(
         base_model_name,
         device_map="auto", 
         low_cpu_mem_usage=True,
@@ -54,6 +58,16 @@ base_model = AutoModelForCausalLM.from_pretrained(
         cache_dir="/root/.cache/huggingface/hub",
         local_files_only=False,
     )
+else:
+    base_model = AutoModelForCausalLM.from_pretrained(
+            base_model_name,
+            device_map="auto", 
+            low_cpu_mem_usage=True,
+            torch_dtype=torch.bfloat16,
+            trust_remote_code=True,
+            cache_dir="/root/.cache/huggingface/hub",
+            local_files_only=False,
+        )
 
 # Load model and tokenizer
 try:

@@ -12,6 +12,7 @@ from peft import LoraConfig, get_peft_model
 
 from SafeMoE.datasets import parse_dataset, SupervisedDataset
 from SafeMoE.models import load_pretrained_models
+from SafeMoE.models.modeling_deepseek import DeepseekV2ForCausalLM
 from SafeMoE.utils import seed_everything, str2bool, is_main_process
 from SafeMoE.trainers import SafeEpochTrainer
 
@@ -252,11 +253,11 @@ def main() -> None:
             args.model_name_or_path,
             model_max_length=args.max_length,
             padding_side='right',
-            auto_model_type=AutoModelForCausalLM,
+            auto_model_type=DeepseekV2ForCausalLM if args.model_name_or_path == 'deepseek-ai/DeepSeek-V2-Lite-Chat' else AutoModelForCausalLM,
             trust_remote_code=True,
         )
 
-    if 'qwen' in args.model_name_or_path.lower():
+    if 'qwen' in args.model_name_or_path.lower() or 'gpt-oss' in args.model_name_or_path.lower():
         target_modules = ["q_proj", "v_proj", "k_proj", "o_proj"]
         lora_alpha = 32
     elif 'deepseek' in args.model_name_or_path.lower():

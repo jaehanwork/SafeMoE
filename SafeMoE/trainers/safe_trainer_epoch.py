@@ -746,6 +746,7 @@ class SafeEpochTrainer(Trainer):
             
             # iterate over the safe dataset by batch with args.per_device_train_batch_size
             safe_batch_size = self.args.per_device_train_batch_size * self.args.gradient_accumulation_steps
+            # safe_batch_size = 4
             for start in tqdm(range(0, len(self.safe_dataset), safe_batch_size), desc="Safe Training Batches"):
                 end = start + safe_batch_size
                 if end > len(self.safe_dataset):

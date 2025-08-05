@@ -1,10 +1,9 @@
 from SafeMoE.models.pretrained import load_pretrained_models, resize_tokenizer_embedding
-from SafeMoE.models.llama_mixin import *
-from SafeMoE.models.qwen2_mixin import *
+from SafeMoE.models.modeling_deepseek import DeepseekV2ForCausalLM, DeepseekV2Model
 
 
 __all__ = ['load_pretrained_models',
            'resize_tokenizer_embedding',
-           'LlamaForCausalLMExpertMixin',
-           'Qwen2ForCausalLMExpertMixin',
+           'DeepseekV2ForCausalLM',
+           'DeepseekV2Model'
           ]

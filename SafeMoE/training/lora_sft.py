@@ -238,7 +238,7 @@ def main() -> None:
         )
     
 
-    if 'qwen' in args.model_name_or_path.lower():
+    if 'qwen' in args.model_name_or_path.lower() or 'gpt-oss' in args.model_name_or_path.lower():
         target_modules = ["q_proj", "v_proj", "k_proj", "o_proj"]
         lora_alpha = 32
     elif 'deepseek' in args.model_name_or_path.lower():
