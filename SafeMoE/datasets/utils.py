@@ -23,7 +23,7 @@ def format_prompt(prompts, tokenizer) -> str:
     return prompt 
     
 
-def right_padding(sequences: list[torch.Tensor], padding_value: Number, max_length: int = None) -> torch.Tensor:
+def right_padding(sequences: list[torch.Tensor], padding_value: Number, max_length: int = 512) -> torch.Tensor:
     padded = pad_sequence(sequences, batch_first=True, padding_value=padding_value)
     if max_length is not None:
         current_length = padded.size(1)
@@ -54,7 +54,7 @@ def get_system_prompt(tokenizer):
     elif 'deepseek' in tokenizer.name_or_path.lower():
         system_prompt = "You are an AI assistant, developed by DeepSeek Company. For politically sensitive questions, security and privacy issues, you will refuse to answer."
     elif 'gpt-oss' in tokenizer.name_or_path.lower():
-        system_prompt = None
+        system_prompt = "You are a helpful AI assistant."
     else:
         assert False, "System prompt is not provided."
 

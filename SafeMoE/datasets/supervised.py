@@ -19,6 +19,7 @@ from typing import Callable
 from typing_extensions import TypedDict  # Python 3.10+
 
 import torch
+from tqdm import tqdm
 
 from SafeMoE.configs import IGNORE_INDEX
 from SafeMoE.datasets.base import CollatorBase, RawSample, TokenizedDataset
@@ -45,6 +46,31 @@ class SupervisedBatch(TypedDict, total=True):
 
 
 class SupervisedDataset(TokenizedDataset):
+    """
+    Dataset for supervised fine-tuning that supports mapping functions to transform samples.
+    
+    This dataset processes raw samples containing input/dialogue and answer pairs into tokenized
+    samples suitable for supervised training. It supports the map operation to apply custom
+    transformations to the processed samples.
+    
+    Example usage:
+        ```python
+        # Create dataset
+        dataset = SupervisedDataset(dataset_config, tokenizer)
+        
+        # Define a transformation function
+        def add_prefix(sample: SupervisedSample) -> SupervisedSample:
+            prefix_id = torch.tensor([tokenizer.bos_token_id])
+            return {
+                'input_ids': torch.cat([prefix_id, sample['input_ids']]),
+                'labels': torch.cat([torch.tensor([IGNORE_INDEX]), sample['labels']])
+            }
+        
+        # Apply transformation
+        mapped_dataset = dataset.map(add_prefix)
+        ```
+    """
+    
     def preprocess(self, raw_sample: RawSample) -> SupervisedSample:
         if raw_sample.get('input') is None and raw_sample.get('dialogue') is None:
             raise ValueError('Either `input` or `dialogue` must be provided.')
@@ -63,9 +89,7 @@ class SupervisedDataset(TokenizedDataset):
             prompts.append({'role': 'user', 'content': raw_sample['input']})
 
             answer = raw_sample['answer']
-            # if 'qwen3' in self.tokenizer.name_or_path.lower():
-            #     prompt = self.tokenizer.apply_chat_template(prompts, tokenize=False, add_generation_prompt=True, enable_thinking=False)
-            # else:
+        
             prompt = self.tokenizer.apply_chat_template(prompts, tokenize=False, add_generation_prompt=True)
             if answer is not None:
                 text = prompt + answer + self.tokenizer.eos_token

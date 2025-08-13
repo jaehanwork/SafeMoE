@@ -233,7 +233,7 @@ def main() -> None:
             model_max_length=args.max_length,
             padding_side='right',
             auto_model_type=AutoModelForCausalLM,
-            trust_remote_code=True,
+            trust_remote_code=False,
             dtype=torch.bfloat16,
         )
     

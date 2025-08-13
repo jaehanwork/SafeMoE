@@ -11,6 +11,7 @@ TRAIN_DATASETS=()
 EPOCHS=3
 RANK=8
 ALPHA=8
+LR=1e-4
 
 while [[ "$#" -gt 0 ]]; do
     arg="$1"
@@ -26,6 +27,10 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         --rank)
             RANK="$1"
+            shift
+            ;;
+        --lr)
+            LR="$1"
             shift
             ;;
         --alpha)
@@ -77,14 +82,14 @@ SafeMoE/training/lora_sft.py \
     --logging_steps 1 \
 	--max_length 512 \
 	--num_train_epochs "${EPOCHS}" \
-	--per_device_train_batch_size 1 \
-    --gradient_accumulation_steps 8 \
+	--per_device_train_batch_size 32 \
+    --gradient_accumulation_steps 1 \
     --gradient_checkpointing False \
-	--learning_rate 1e-4 \
+	--learning_rate "${LR}" \
 	--lr_scheduler_type cosine \
 	--warmup_ratio 0.03 \
 	--weight_decay 0.01 \
-    --save_strategy no \
+    --save_strategy steps \
     --save_steps 50 \
 	--seed 42 \
 	--output_dir "${OUTPUT_DIR}" \

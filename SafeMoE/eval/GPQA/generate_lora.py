@@ -41,6 +41,13 @@ def extract_answer_letter(response):
             # if match:
             #     return match.group(0)
             # else:
+
+            # match **{answer}**
+            # pattern = r"\*\*([A-J])\*\*"
+            # match = re.search(pattern, response)
+            # if match:
+            #     return match.group(1)
+            
             return None
 
 def main() -> None:
@@ -68,7 +75,7 @@ def main() -> None:
                     option = options[letter]
                     option_text += f"{letter}. {option}\n"
                 
-                prompt = f"Given the following question and four candidate answers (A, B, C and D), choose the best answer.\n\nQuestion: {question}\n{option_text}\n- For simple problems:\nDirectly provide the answer with minimal explanation.\n\n- For complex problems:\nUse this step-by-step format:\n## Step 1: [Concise description]\n[Brief explanation]\n## Step 2: [Concise description]\n[Brief explanation]\n\nRegardless of the approach, always conclude with:\nThe best answer is [the_answer_letter].\nwhere the [the_answer_letter] is one of A, B, C or D.\n\n"
+                prompt = f"Given the following question and four candidate answers (A, B, C and D), choose the best answer.\n\nQuestion: {question}\n{option_text}\n- For simple problems:\nDirectly provide the answer with minimal explanation.\n\n- For complex problems:\nUse this step-by-step format:\n## Step 1: [Concise description]\n[Brief explanation]\n## Step 2: [Concise description]\n[Brief explanation]\n\nRegardless of the approach, always conclude with:\nThe best answer is [the_answer_letter].\nwhere the [the_answer_letter] is one of A, B, C or D.\n\nLet's think step by step."
                 
                 message = [
                     {"role": "system", "content": "You are a helpful assistant for answering multiple choice questions."},
@@ -137,15 +144,15 @@ def main() -> None:
         with open(save_path, "r") as f:
             results_out = json.load(f)
     
-    # Update results with newly parsed answers
-    for result in results_out:
-        response = result['response']
-        correct_answer = result['correct_answer']
-        parsed_answer = extract_answer_letter(response)
-        is_correct = parsed_answer == correct_answer if parsed_answer is not None else False
-        
-        result['parsed_answer'] = parsed_answer
-        result['is_correct'] = is_correct
+        # Update results with newly parsed answers
+        for result in results_out:
+            response = result['response']
+            correct_answer = result['correct_answer']
+            parsed_answer = extract_answer_letter(response)
+            is_correct = parsed_answer == correct_answer if parsed_answer is not None else False
+            
+            result['parsed_answer'] = parsed_answer
+            result['is_correct'] = is_correct
     
     # Save updated results back to file
     with open(save_path, "w") as f:

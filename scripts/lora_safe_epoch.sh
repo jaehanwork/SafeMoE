@@ -93,14 +93,15 @@ SafeMoE/training/lora_safe_epoch.py \
 	--max_length 512 \
     --temp "${TEMP}" \
 	--num_train_epochs "${EPOCHS}" \
-	--per_device_train_batch_size 2 \
-    --gradient_accumulation_steps 4 \
+	--per_device_train_batch_size 32 \
+    --gradient_accumulation_steps 1 \
     --gradient_checkpointing False \
 	--learning_rate 1e-4 \
 	--lr_scheduler_type cosine \
 	--warmup_ratio 0.03 \
 	--weight_decay 0.01 \
-    --save_strategy no \
+    --save_strategy steps \
+    --save_steps 50 \
 	--seed 42 \
 	--output_dir "${OUTPUT_DIR}" \
 	--report_to wandb \

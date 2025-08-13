@@ -40,7 +40,6 @@ def main() -> None:
         disable_custom_all_reduce=True,  # Disable custom all reduce
         enforce_eager=True,  # Disable torch.compile
         disable_log_stats=True,  # Disable logging stats
-        sinks=False,
     )
     
     dataset = load_dataset("JailbreakBench/JBB-Behaviors", "behaviors")["harmful"]

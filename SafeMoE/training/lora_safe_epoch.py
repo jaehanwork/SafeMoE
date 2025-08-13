@@ -62,6 +62,12 @@ def parse_arguments() -> argparse.Namespace:
         default=8,
         help='The alpha of the LoRA layers.',
     )
+    model_parser.add_argument(
+        '--safe_dataset_size',
+        type=int,
+        default=100,
+        help='The size of the safe dataset to use for training.',
+    )
 
 
     # Dataset
@@ -248,7 +254,7 @@ def main() -> None:
 
     if is_main_process():
         logger.warning(args.train_datasets)
-    
+
     base_model, tokenizer = load_pretrained_models(
             args.model_name_or_path,
             model_max_length=args.max_length,
@@ -286,9 +292,14 @@ def main() -> None:
         )
     
     train_dataset_safe = SupervisedDataset(
-            [('safe-llama-instruction/train_100', {'proportion': 1.0})],
+            [(f'safe-llama-instruction/train_{args.safe_dataset_size}', {'proportion': 1.0})],
             tokenizer=tokenizer,
         )
+    safe_dataset_len = len(train_dataset_safe)
+
+    if is_main_process():
+        logger.warning(args.train_datasets)
+        logger.warning(f'Safe dataset size: {safe_dataset_len}')
 
 
     with open(args.routing_logits_safe, 'r') as f:
@@ -342,7 +353,9 @@ def main() -> None:
         logger.warning(tokenizer.decode(train_dataset[0]['input_ids'], skip_special_tokens=True))
         logger.warning('Train safe data example:')
         logger.warning(tokenizer.decode(train_dataset_safe[0]['input_ids'], skip_special_tokens=True))
-        
+
+        logger.warning(f'Safe temperature: {args.temp}')
+
     trainer.train()
     trainer.processing_class.model_max_length = 4096
     

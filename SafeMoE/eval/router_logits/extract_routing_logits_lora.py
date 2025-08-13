@@ -37,7 +37,7 @@ device = accelerator.device
 
 if "OLMoE-1B-7B-0125-Instruct" in model_name or "olmoe" in model_name.lower():
     base_model_name = "allenai/OLMoE-1B-7B-0125-Instruct"
-elif 'qwen' in model_name.lower():
+elif 'qwen3' in model_name.lower():
     base_model_name = "Qwen/Qwen3-30B-A3B"
 elif 'qwen1.5' in model_name.lower():
     base_model_name = "Qwen/Qwen1.5-MoE-A2.7B-Chat"
@@ -51,12 +51,8 @@ print(f"Base model: {base_model_name}")
 if base_model_name == "deepseek-ai/DeepSeek-V2-Lite-Chat":
     base_model = DeepseekV2ForCausalLM.from_pretrained(
         base_model_name,
-        device_map="auto", 
-        low_cpu_mem_usage=True,
         torch_dtype=torch.bfloat16,
         trust_remote_code=True,
-        cache_dir="/root/.cache/huggingface/hub",
-        local_files_only=False,
     )
 else:
     base_model = AutoModelForCausalLM.from_pretrained(
@@ -166,4 +162,4 @@ save_path = os.path.join(output_dir, f"directions.json")
 with open(save_path, "w") as f:
     json.dump(directions, f)
 
-print(f"============= Results saved to {save_path} =============")
+print(f"============= Results saved to {output_dir} =============")

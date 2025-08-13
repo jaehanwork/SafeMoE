@@ -1,0 +1,21 @@
+{
+  "_data_files": [
+    {
+      "filename": "data-00000-of-00001.arrow"
+    }
+  ],
+  "_fingerprint": "301558c70ca730bb",
+  "_format_columns": [
+    "question",
+    "choices",
+    "answer",
+    "error_type",
+    "source",
+    "correct_answer",
+    "potential_reason"
+  ],
+  "_format_kwargs": {},
+  "_format_type": null,
+  "_output_all_columns": false,
+  "_split": null
+}
