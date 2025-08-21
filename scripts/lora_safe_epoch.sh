@@ -100,7 +100,7 @@ SafeMoE/training/lora_safe_epoch.py \
 	--lr_scheduler_type cosine \
 	--warmup_ratio 0.03 \
 	--weight_decay 0.01 \
-    --save_strategy steps \
+    --save_strategy no \
     --save_steps 50 \
 	--seed 42 \
 	--output_dir "${OUTPUT_DIR}" \

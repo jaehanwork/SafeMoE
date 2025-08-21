@@ -23,3 +23,4 @@ from SafeMoE.datasets.raw.cheat import *
 from SafeMoE.datasets.raw.gms8k import *
 from SafeMoE.datasets.raw.pubmedqa import *
 from SafeMoE.datasets.raw.sql import *
+from SafeMoE.datasets.raw.alpaca import *

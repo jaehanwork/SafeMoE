@@ -262,6 +262,7 @@ def main() -> None:
             auto_model_type=DeepseekV2ForCausalLM if args.model_name_or_path == 'deepseek-ai/DeepSeek-V2-Lite-Chat' else AutoModelForCausalLM,
             trust_remote_code=True,
         )
+    # base_model.config.router_aux_loss_coef = 0.0
 
     if 'qwen' in args.model_name_or_path.lower() or 'gpt-oss' in args.model_name_or_path.lower():
         target_modules = ["q_proj", "v_proj", "k_proj", "o_proj"]

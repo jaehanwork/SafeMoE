@@ -2,7 +2,7 @@
 import os
 import argparse
 from transformers import AutoTokenizer, AutoModel, logging, AutoModelForCausalLM
-from datasets import Dataset
+from datasets import Dataset, load_dataset
 import torch
 from torch.utils.data import DataLoader
 from accelerate import Accelerator
@@ -81,12 +81,9 @@ model = PeftModel.from_pretrained(base_model, args.model_name_or_path,
                                 local_files_only=False,torch_dtype=torch.bfloat16) #load peft model
 
 
-with open('/root/SafeMoE/SafeMoE/datasets/raw/raw_data/safety_only_data_Instructions.json', 'r') as f:
-    data_json = json.load(f)[:args.sample_size]
-            
+dataset = load_dataset("JailbreakBench/JBB-Behaviors", "behaviors")["harmful"]
+text_key = "Goal"
 
-dataset = Dataset.from_list(data_json)
-text_key = 'instruction'
 total = len(dataset)
 
 print('=============================')
