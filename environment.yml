@@ -1,8 +1,6 @@
-name: moe-safe
+name: SafeMoE
 channels:
   - defaults
-  - https://repo.anaconda.com/pkgs/main
-  - https://repo.anaconda.com/pkgs/r
 dependencies:
   - _libgcc_mutex=0.1=main
   - _openmp_mutex=5.1=1_gnu
@@ -46,6 +44,7 @@ dependencies:
       - attrs==25.3.0
       - blake3==1.0.5
       - cachetools==6.1.0
+      - cbor2==5.7.0
       - certifi==2025.6.15
       - charset-normalizer==3.4.2
       - click==8.2.1
@@ -86,7 +85,7 @@ dependencies:
       - httpcore==1.0.9
       - httptools==0.6.4
       - httpx==0.28.1
-      - huggingface-hub==0.33.0
+      - huggingface-hub==0.34.4
       - idna==3.10
       - importlib-metadata==8.7.0
       - interegular==0.3.3
@@ -172,6 +171,7 @@ dependencies:
       - pure-eval==0.2.3
       - py-cpuinfo==9.0.0
       - pyarrow==20.0.0
+      - pybase64==1.4.2
       - pycountry==24.6.1
       - pydantic==2.11.7
       - pydantic-core==2.33.2
@@ -215,7 +215,7 @@ dependencies:
       - tornado==6.5.1
       - tqdm==4.67.1
       - traitlets==5.14.3
-      - transformers==4.52.4
+      - transformers==4.55.3
       - triton==3.3.0
       - typer==0.16.0
       - typing-extensions==4.14.0
