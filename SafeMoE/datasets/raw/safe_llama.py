@@ -4,11 +4,18 @@ import json
 
 
 __all__ = ['SafeLLAMADataset', 
-           'SafeLLAMATrain10Dataset', 
            'SafeLLAMATrain50Dataset', 
            'SafeLLAMATrain100Dataset', 
            'SafeLLAMATrain500Dataset', 
+           'SafeLLAMAInstructionTrain10Dataset',
+           'SafeLLAMAInstructionTrain20Dataset',
+           'SafeLLAMAInstructionTrain30Dataset',
+           'SafeLLAMAInstructionTrain40Dataset',
            'SafeLLAMAInstructionTrain50Dataset',
+           'SafeLLAMAInstructionTrain60Dataset',
+           'SafeLLAMAInstructionTrain70Dataset',
+           'SafeLLAMAInstructionTrain80Dataset',
+           'SafeLLAMAInstructionTrain90Dataset',
            'SafeLLAMAInstructionTrain100Dataset',
            'SafeLLAMAInstructionTrain150Dataset',
            'SafeLLAMAInstructionTrain200Dataset',
@@ -44,19 +51,6 @@ class SafeLLAMADataset(RawDataset):
     def __len__(self) -> int:
         return len(self.data)  
 
-class SafeLLAMATrain10Dataset(SafeLLAMADataset):
-    NAME: str = 'safe-llama/train_10'
-
-    def __init__(self, path: str | None = None) -> None:
-        with open(safe_path, 'r') as f:
-            self.data = json.load(f)
-            
-        self.data = self.data[:10]
-
-        print('=============================')
-        print(f'{self.NAME} {len(self.data)}')
-        print('=============================')  
-
 class SafeLLAMATrain50Dataset(SafeLLAMADataset):
     NAME: str = 'safe-llama/train_50'
 
@@ -69,7 +63,6 @@ class SafeLLAMATrain50Dataset(SafeLLAMADataset):
         print('=============================')
         print(f'{self.NAME} {len(self.data)}')
         print('=============================')  
-    
 
 class SafeLLAMATrain100Dataset(SafeLLAMADataset):
     NAME: str = 'safe-llama/train_100'
@@ -96,6 +89,87 @@ class SafeLLAMATrain500Dataset(SafeLLAMADataset):
         print('=============================')
         print(f'{self.NAME} {len(self.data)}')
         print('=============================')
+    
+
+class SafeLLAMAInstructionTrain10Dataset(SafeLLAMADataset):
+    NAME: str = 'safe-llama-instruction/train_10'
+
+    def __init__(self, path: str | None = None) -> None:
+        with open(safe_path, 'r') as f:
+            self.data = json.load(f)
+
+        self.data = self.data[:10]
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+    def __getitem__(self, index: int) -> RawSample:
+        data = self.data[index]
+        return RawSample(
+            input=data['instruction'],
+            answer=None,
+        )
+
+class SafeLLAMAInstructionTrain20Dataset(SafeLLAMADataset):
+    NAME: str = 'safe-llama-instruction/train_20'
+
+    def __init__(self, path: str | None = None) -> None:
+        with open(safe_path, 'r') as f:
+            self.data = json.load(f)
+
+        self.data = self.data[:20]
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+    def __getitem__(self, index: int) -> RawSample:
+        data = self.data[index]
+        return RawSample(
+            input=data['instruction'],
+            answer=None,
+        )
+
+class SafeLLAMAInstructionTrain30Dataset(SafeLLAMADataset):
+    NAME: str = 'safe-llama-instruction/train_30'
+
+    def __init__(self, path: str | None = None) -> None:
+        with open(safe_path, 'r') as f:
+            self.data = json.load(f)
+
+        self.data = self.data[:30]
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+    def __getitem__(self, index: int) -> RawSample:
+        data = self.data[index]
+        return RawSample(
+            input=data['instruction'],
+            answer=None,
+        )
+
+class SafeLLAMAInstructionTrain40Dataset(SafeLLAMADataset):
+    NAME: str = 'safe-llama-instruction/train_40'
+
+    def __init__(self, path: str | None = None) -> None:
+        with open(safe_path, 'r') as f:
+            self.data = json.load(f)
+
+        self.data = self.data[:40]
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+    def __getitem__(self, index: int) -> RawSample:
+        data = self.data[index]
+        return RawSample(
+            input=data['instruction'],
+            answer=None,
+        )
 
 class SafeLLAMAInstructionTrain50Dataset(SafeLLAMADataset):
     NAME: str = 'safe-llama-instruction/train_50'
@@ -105,6 +179,82 @@ class SafeLLAMAInstructionTrain50Dataset(SafeLLAMADataset):
             self.data = json.load(f)
 
         self.data = self.data[:50]
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+    def __getitem__(self, index: int) -> RawSample:
+        data = self.data[index]
+        return RawSample(
+            input=data['instruction'],
+            answer=None,
+        )
+class SafeLLAMAInstructionTrain60Dataset(SafeLLAMADataset):
+    NAME: str = 'safe-llama-instruction/train_60'
+
+    def __init__(self, path: str | None = None) -> None:
+        with open(safe_path, 'r') as f:
+            self.data = json.load(f)
+
+        self.data = self.data[:60]
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+    def __getitem__(self, index: int) -> RawSample:
+        data = self.data[index]
+        return RawSample(
+            input=data['instruction'],
+            answer=None,
+        )
+class SafeLLAMAInstructionTrain70Dataset(SafeLLAMADataset):
+    NAME: str = 'safe-llama-instruction/train_70'
+
+    def __init__(self, path: str | None = None) -> None:
+        with open(safe_path, 'r') as f:
+            self.data = json.load(f)
+
+        self.data = self.data[:70]
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+    def __getitem__(self, index: int) -> RawSample:
+        data = self.data[index]
+        return RawSample(
+            input=data['instruction'],
+            answer=None,
+        )
+class SafeLLAMAInstructionTrain80Dataset(SafeLLAMADataset):
+    NAME: str = 'safe-llama-instruction/train_80'
+
+    def __init__(self, path: str | None = None) -> None:
+        with open(safe_path, 'r') as f:
+            self.data = json.load(f)
+
+        self.data = self.data[:80]
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+    def __getitem__(self, index: int) -> RawSample:
+        data = self.data[index]
+        return RawSample(
+            input=data['instruction'],
+            answer=None,
+        )
+class SafeLLAMAInstructionTrain90Dataset(SafeLLAMADataset):
+    NAME: str = 'safe-llama-instruction/train_90'
+
+    def __init__(self, path: str | None = None) -> None:
+        with open(safe_path, 'r') as f:
+            self.data = json.load(f)
+
+        self.data = self.data[:90]
 
         print('=============================')
         print(f'{self.NAME} {len(self.data)}')

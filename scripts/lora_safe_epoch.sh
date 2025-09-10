@@ -14,6 +14,7 @@ RANK=8
 ALPHA=8
 EPOCHS=3
 TOPK=None
+SAFE_DATASET_SIZE=100
 
 while [[ "$#" -gt 0 ]]; do
     arg="$1"
@@ -47,6 +48,10 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         --temp)
             TEMP="$1"
+            shift
+            ;;
+        --safe_dataset_size)
+            SAFE_DATASET_SIZE="$1"
             shift
             ;;
         --topk)
@@ -86,6 +91,7 @@ accelerate launch --config_file config/new_config.yaml \
 SafeMoE/training/lora_safe_epoch.py \
     --train_datasets ${TRAIN_DATASETS[@]} \
 	--model_name_or_path "${MODEL_NAME_OR_PATH}" \
+    --safe_dataset_size "${SAFE_DATASET_SIZE}" \
     --rank "${RANK}" \
     --alpha "${ALPHA}" \
     --do_train True \

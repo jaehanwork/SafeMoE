@@ -304,7 +304,7 @@ def main() -> None:
 
 
     with open(args.routing_logits_safe, 'r') as f:
-        routing_logits_safe = json.load(f)
+        routing_logits_safe = json.load(f)[:args.safe_dataset_size]
         routing_logits_safe_dataset = Dataset.from_dict({'routing_logits': routing_logits_safe})
     
     

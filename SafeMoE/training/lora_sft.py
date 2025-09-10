@@ -233,7 +233,7 @@ def main() -> None:
             model_max_length=args.max_length,
             padding_side='right',
             auto_model_type=AutoModelForCausalLM,
-            trust_remote_code=False,
+            trust_remote_code=('deepseek' in args.model_name_or_path.lower()),
             dtype=torch.bfloat16,
         )
     

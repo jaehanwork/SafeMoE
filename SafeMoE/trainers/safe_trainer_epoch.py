@@ -818,7 +818,7 @@ class SafeEpochTrainer(Trainer):
             #         param.requires_grad = False
             # model._orig_mod.module.print_trainable_parameters()
 
-            
+            #### DEFENSE START ####
             # iterate over the safe dataset by batch with args.per_device_train_batch_size
             safe_batch_size = self.args.per_device_train_batch_size * self.args.gradient_accumulation_steps
             # safe_batch_size = 4
@@ -881,7 +881,8 @@ class SafeEpochTrainer(Trainer):
                 # logging routing_loss
                 if is_main_process():
                     self.log({"routing_loss": routing_loss.item()})
-
+            
+            #### DEFENSE END ####
                 
 
             if self.control.should_training_stop:
