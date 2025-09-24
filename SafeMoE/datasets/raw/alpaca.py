@@ -18,7 +18,7 @@ from datasets import load_dataset
 from SafeMoE.datasets.base import RawDataset, RawSample
 
 
-__all__ = ['AlpacaDataset', 'Alpaca5KDataset', 'Alpaca10KDataset']
+__all__ = ['AlpacaDataset', 'Alpaca5KDataset', 'Alpaca5500KDataset', 'Alpaca10KDataset']
 
 
 class AlpacaDataset(RawDataset):
@@ -46,6 +46,13 @@ class Alpaca5KDataset(AlpacaDataset):
     def __init__(self, path: str | None = None) -> None:
         self.data = load_dataset(path or 'tatsu-lab/alpaca', split='train')
         self.data = self.data.select(range(5000))
+
+class Alpaca5500KDataset(AlpacaDataset):
+    NAME: str = 'Alpaca/train_5.5k'
+    
+    def __init__(self, path: str | None = None) -> None:
+        self.data = load_dataset(path or 'tatsu-lab/alpaca', split='train')
+        self.data = self.data.select(range(5500))
 
 class Alpaca10KDataset(AlpacaDataset):
     NAME: str = 'Alpaca/train_10k'
