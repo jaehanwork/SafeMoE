@@ -8,10 +8,15 @@ export LOGLEVEL="${LOGLEVEL:-WARNING}"
 MODEL_NAME_OR_PATH=""
 OUTPUT_DIR=""
 TRAIN_DATASETS=()
-EPOCHS=3
+ROUTING_LOGITS_SAFE=""
+TEMP=1.0
 RANK=8
 ALPHA=8
-LR=1e-4
+EPOCHS=3
+TOPK=None
+SAFE_DATASET_SIZE=100
+SAFE_LAYER_INDICES=""
+SAFE_LAYER_RANGE=""
 
 while [[ "$#" -gt 0 ]]; do
     arg="$1"
@@ -29,10 +34,6 @@ while [[ "$#" -gt 0 ]]; do
             RANK="$1"
             shift
             ;;
-        --lr)
-            LR="$1"
-            shift
-            ;;
         --alpha)
             ALPHA="$1"
             shift
@@ -45,6 +46,30 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         --output_dir)
             OUTPUT_DIR="$1"
+            shift
+            ;;
+        --temp)
+            TEMP="$1"
+            shift
+            ;;
+        --safe_dataset_size)
+            SAFE_DATASET_SIZE="$1"
+            shift
+            ;;
+        --topk)
+            TOPK="$1"
+            shift
+            ;;
+        --routing_logits_safe)
+            ROUTING_LOGITS_SAFE="$1"
+            shift
+            ;;
+        --safe_layer_indices)
+            SAFE_LAYER_INDICES="$1"
+            shift
+            ;;
+        --safe_layer_range)
+            SAFE_LAYER_RANGE="$1"
             shift
             ;;
         *)
@@ -70,29 +95,42 @@ exec 1> >(tee "${OUTPUT_DIR}/stdout.log" >&1) 2> >(tee "${OUTPUT_DIR}/stderr.log
 
 echo ${TRAIN_DATASETS[@]}
 
-export WANDB_PROJECT=LoRA_SFT
+export WANDB_PROJECT=LoRA_Safe
 
-accelerate launch --config_file config/new_config.yaml \
-SafeMoE/training/lora_sft.py \
+cmd=(accelerate launch --config_file config/new_config.yaml \
+    SafeMoE/training/lora_safe_epoch_layer.py \
     --train_datasets ${TRAIN_DATASETS[@]} \
-	--model_name_or_path "${MODEL_NAME_OR_PATH}" \
+    --model_name_or_path "${MODEL_NAME_OR_PATH}" \
+    --safe_dataset_size "${SAFE_DATASET_SIZE}" \
     --rank "${RANK}" \
     --alpha "${ALPHA}" \
     --do_train True \
     --logging_steps 1 \
-	--max_length 512 \
-	--num_train_epochs "${EPOCHS}" \
-	--per_device_train_batch_size 32 \
+    --max_length 512 \
+    --temp "${TEMP}" \
+    --num_train_epochs "${EPOCHS}" \
+    --per_device_train_batch_size 32 \
     --gradient_accumulation_steps 1 \
     --gradient_checkpointing False \
-	--learning_rate "${LR}" \
-	--lr_scheduler_type cosine \
-	--warmup_ratio 0.03 \
-	--weight_decay 0.01 \
-    --save_strategy steps \
+    --learning_rate 1e-4 \
+    --lr_scheduler_type cosine \
+    --warmup_ratio 0.03 \
+    --weight_decay 0.01 \
+    --save_strategy no \
     --save_steps 50 \
-	--seed 42 \
-	--output_dir "${OUTPUT_DIR}" \
-	--report_to wandb \
+    --seed 42 \
+    --output_dir "${OUTPUT_DIR}" \
+    --report_to wandb \
     --bf16 True \
-	--tf32 True
+    --tf32 True \
+    --routing_logits_safe "${ROUTING_LOGITS_SAFE}" )
+
+if [[ -n "$SAFE_LAYER_INDICES" ]]; then
+    cmd+=( --safe_layer_indices "$SAFE_LAYER_INDICES" )
+fi
+if [[ -n "$SAFE_LAYER_RANGE" ]]; then
+    cmd+=( --safe_layer_range "$SAFE_LAYER_RANGE" )
+fi
+
+printf 'Running command:\n%s\n' "${cmd[*]}"
+"${cmd[@]}"

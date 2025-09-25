@@ -14,7 +14,8 @@ from SafeMoE.datasets import parse_dataset, SupervisedDataset
 from SafeMoE.models import load_pretrained_models
 from SafeMoE.models.modeling_deepseek import DeepseekV2ForCausalLM
 from SafeMoE.utils import seed_everything, str2bool, is_main_process
-from SafeMoE.trainers import SafeEpochTrainer
+# Import the layer-aware trainer directly (avoids older class without safe_layer_indices)
+from SafeMoE.trainers.safe_trainer_epoch_layer import SafeEpochTrainer
 
 import json
 from pdb import set_trace
@@ -49,6 +50,18 @@ def parse_arguments() -> argparse.Namespace:
         '--topk',
         type=int,
         default=None,
+    )
+    model_parser.add_argument(
+        '--safe_layer_indices',
+        type=str,
+        default=None,
+        help='Comma-separated MoE layer indices to include in safety routing loss (e.g. 0,2,5). Use all if omitted.'
+    )
+    model_parser.add_argument(
+        '--safe_layer_range',
+        type=str,
+        default=None,
+        help='Range syntax start-end or start~end inclusive for consecutive MoE layers to include (e.g. 0-3). Overrides --safe_layer_indices if provided.'
     )
     model_parser.add_argument(
         '--rank',
@@ -242,6 +255,23 @@ def parse_arguments() -> argparse.Namespace:
 
     args = parser.parse_args()
 
+    # Post-process safe layer selection
+    if getattr(args, 'safe_layer_range', None):
+        rng = args.safe_layer_range.replace('~', '-').split('-')
+        if len(rng) == 2 and all(r.isdigit() for r in rng):
+            start, end = map(int, rng)
+            if end < start:
+                start, end = end, start
+            args.safe_layer_indices = ','.join(str(i) for i in range(start, end + 1))
+        else:
+            raise ValueError(f"Invalid --safe_layer_range format: {args.safe_layer_range}")
+
+    # Debug prints for user confirmation
+    if args.safe_layer_range:
+        print(f"[SAFE_LAYER_RANGE] raw='{args.safe_layer_range}' -> indices='{args.safe_layer_indices}'")
+    elif args.safe_layer_indices:
+        print(f"[SAFE_LAYER_INDICES] indices='{args.safe_layer_indices}'")
+
     return args
 
 
@@ -342,7 +372,8 @@ def main() -> None:
         train_dataset_safe=train_dataset_safe,
         routing_logits_safe=routing_logits_safe_dataset,
         tokenizer=tokenizer,
-        data_collator=train_dataset.get_collator()
+        data_collator=train_dataset.get_collator(),
+        safe_layer_indices=[int(x) for x in args.safe_layer_indices.split(',')] if args.safe_layer_indices else None,
     )
 
     if is_main_process():

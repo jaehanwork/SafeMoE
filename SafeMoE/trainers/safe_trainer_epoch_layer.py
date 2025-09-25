@@ -263,8 +263,8 @@ from pdb import set_trace
 logger = logging.getLogger(__name__)
 
 class SafeEpochTrainer(Trainer):
-        
-    def __init__(self, train_dataset_safe, routing_logits_safe, temp, topk=None, safe_dataset_size=None,*args, **kwargs):
+    
+    def __init__(self, train_dataset_safe, routing_logits_safe, temp, topk=None, safe_dataset_size=None, safe_layer_indices=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.train_dataset_safe = train_dataset_safe
         self.temp = temp
@@ -272,6 +272,10 @@ class SafeEpochTrainer(Trainer):
         self.safe_dataset = train_dataset_safe
         self.routing_logits_safe = routing_logits_safe
         self.safe_dataset_size = safe_dataset_size
+        # List[int] of layer indices to apply safety routing KL on. If None -> all layers
+        self.safe_layer_indices = safe_layer_indices
+        if is_main_process():
+            print(f"[SAFE_INIT] safe_layer_indices={self.safe_layer_indices if self.safe_layer_indices is not None else 'ALL'}")
 
         self.kl_loss = torch.nn.KLDivLoss(reduction='batchmean')
 
@@ -859,15 +863,40 @@ class SafeEpochTrainer(Trainer):
                 routing_loss = 0.0
                 
                 current_batch_size = end - start
-                safe_routing_logits_stacked = torch.stack([safe_routing_logits_layer.reshape(current_batch_size, -1, safe_routing_logits_layer.shape[-1])[torch.arange(current_batch_size), safe_attention_mask.sum(-1)-1, :] for safe_routing_logits_layer in safe_routing_logits])
+                # Select only specified layers (or all if None)
+                if self.safe_layer_indices is not None:
+                    selected_layers = [safe_routing_logits[idx] for idx in self.safe_layer_indices if idx < len(safe_routing_logits)]
+                else:
+                    selected_layers = list(safe_routing_logits)
+
+                safe_routing_logits_stacked = torch.stack([
+                    layer.reshape(current_batch_size, -1, layer.shape[-1])[torch.arange(current_batch_size), safe_attention_mask.sum(-1)-1, :]
+                    for layer in selected_layers
+                ])
                 safe_routing_logits_batch = safe_routing_logits_stacked.transpose(0, 1)
-                routing_batch = torch.tensor([self.routing_logits_safe[i]["routing_logits"] for i in range(start, end)]).to(self.args.device)
+                routing_batch_full = torch.tensor([self.routing_logits_safe[i]["routing_logits"] for i in range(start, end)]).to(self.args.device)
+                # routing_batch_full shape: (B, L_full, E). Need to slice if subset of layers
+                if self.safe_layer_indices is not None:
+                    routing_batch = routing_batch_full[:, self.safe_layer_indices, :]
+                else:
+                    routing_batch = routing_batch_full
+
+                # Minimal one-time debug to verify layer filtering & shapes
+                if batch_index == 0 and i == 0 and is_main_process():
+                    try:
+                        print(f"[SAFETY DEBUG] epoch={epoch} selected_layers={self.safe_layer_indices if self.safe_layer_indices is not None else 'ALL'} student_logits_shape={safe_routing_logits_batch.shape} teacher_logits_shape={routing_batch.shape}")
+                    except Exception:
+                        pass
             
 
                 ######### vanilla kl
                 safe_routing_logits_batch = (safe_routing_logits_batch/self.temp).log_softmax(dim=-1)
                 routing_batch = (routing_batch/self.temp).softmax(dim=-1)
-                routing_loss += self.kl_loss(safe_routing_logits_batch, routing_batch)
+                try:
+                    routing_loss += self.kl_loss(safe_routing_logits_batch, routing_batch)
+                except Exception as e:
+                    logger.warning(f"Routing KL failed: {e}; logits_student={safe_routing_logits_batch.shape}, logits_teacher={routing_batch.shape}")
+                    continue
                 #########
 
                 ######### topk kl

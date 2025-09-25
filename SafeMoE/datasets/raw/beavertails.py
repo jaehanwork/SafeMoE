@@ -9,7 +9,19 @@ __all__ = ['BeaverTailsDataset',
             'BeaverTailsTrain32Dataset',
            'BeaverTailsTrain100Dataset', 
            'BeaverTailsTrain200Dataset', 
-           'BeaverTailsTrain500Dataset']
+           'BeaverTailsTrain300Dataset', 
+           'BeaverTailsTrain400Dataset', 
+           'BeaverTailsTrain500Dataset',
+           'BeaverTailsTrain1500Dataset',
+           'BeaverTailsTrain2000kDataset',
+           'BeaverTailsTrain2500Dataset',
+           'BeaverTailsTrain3000Dataset',
+              'BeaverTailsTrain3500Dataset',
+              'BeaverTailsTrain4000Dataset',
+                'BeaverTailsTrain4500Dataset',
+                'BeaverTailsTrain5000Dataset',
+            'BeaverTailsTrain250Dataset'
+           ]
 
 
 class BeaverTailsDataset(RawDataset):
@@ -42,6 +54,32 @@ class BeaverTailsTrain1kDataset(BeaverTailsDataset):
         self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
         self.data = self.data.filter(lambda x: x["is_safe"] == False)
         self.data = self.data.select(range(1000))
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+class BeaverTailsTrain400Dataset(BeaverTailsDataset):
+    NAME: str = 'BeaverTails/train_400'
+    SPLIT: str = '330k_train'
+
+    def __init__(self, path: str | None = None) -> None:
+        self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
+        self.data = self.data.filter(lambda x: x["is_safe"] == False)
+        self.data = self.data.select(range(400))
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+class BeaverTailsTrain300Dataset(BeaverTailsDataset):
+    NAME: str = 'BeaverTails/train_300'
+    SPLIT: str = '330k_train'
+
+    def __init__(self, path: str | None = None) -> None:
+        self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
+        self.data = self.data.filter(lambda x: x["is_safe"] == False)
+        self.data = self.data.select(range(300))
 
         print('=============================')
         print(f'{self.NAME} {len(self.data)}')
@@ -94,6 +132,123 @@ class BeaverTailsTrain32Dataset(BeaverTailsDataset):
         self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
         self.data = self.data.filter(lambda x: x["is_safe"] == False)
         self.data = self.data.select(range(32))
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+class BeaverTailsTrain5000Dataset(BeaverTailsDataset):
+    NAME: str = 'BeaverTails/train_5000'
+    SPLIT: str = '330k_train'
+
+    def __init__(self, path: str | None = None) -> None:
+        self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
+        self.data = self.data.filter(lambda x: x["is_safe"] == False)
+        self.data = self.data.select(range(5000))
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+class BeaverTailsTrain4500Dataset(BeaverTailsDataset):
+    NAME: str = 'BeaverTails/train_4500'
+    SPLIT: str = '330k_train'
+
+    def __init__(self, path: str | None = None) -> None:
+        self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
+        self.data = self.data.filter(lambda x: x["is_safe"] == False)
+        self.data = self.data.select(range(4500))
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+class BeaverTailsTrain4000Dataset(BeaverTailsDataset):
+    NAME: str = 'BeaverTails/train_4000'
+    SPLIT: str = '330k_train'
+
+    def __init__(self, path: str | None = None) -> None:
+        self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
+        self.data = self.data.filter(lambda x: x["is_safe"] == False)
+        self.data = self.data.select(range(4000))
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+class BeaverTailsTrain3500Dataset(BeaverTailsDataset):
+    NAME: str = 'BeaverTails/train_3500'
+    SPLIT: str = '330k_train'
+
+    def __init__(self, path: str | None = None) -> None:
+        self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
+        self.data = self.data.filter(lambda x: x["is_safe"] == False)
+        self.data = self.data.select(range(3500))
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+class BeaverTailsTrain3000Dataset(BeaverTailsDataset):
+    NAME: str = 'BeaverTails/train_3000'
+    SPLIT: str = '330k_train'
+
+    def __init__(self, path: str | None = None) -> None:
+        self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
+        self.data = self.data.filter(lambda x: x["is_safe"] == False)
+        self.data = self.data.select(range(3000))
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+class BeaverTailsTrain2500Dataset(BeaverTailsDataset):
+    NAME: str = 'BeaverTails/train_2500'
+    SPLIT: str = '330k_train'
+
+    def __init__(self, path: str | None = None) -> None:
+        self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
+        self.data = self.data.filter(lambda x: x["is_safe"] == False)
+        self.data = self.data.select(range(2500))
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+class BeaverTailsTrain2000kDataset(BeaverTailsDataset):
+    NAME: str = 'BeaverTails/train_2000'
+    SPLIT: str = '330k_train'
+
+    def __init__(self, path: str | None = None) -> None:
+        self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
+        self.data = self.data.filter(lambda x: x["is_safe"] == False)
+        self.data = self.data.select(range(2000))
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+class BeaverTailsTrain1500Dataset(BeaverTailsDataset):
+    NAME: str = 'BeaverTails/train_1500'
+    SPLIT: str = '330k_train'
+
+    def __init__(self, path: str | None = None) -> None:
+        self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
+        self.data = self.data.filter(lambda x: x["is_safe"] == False)
+        self.data = self.data.select(range(1500))
+
+        print('=============================')
+        print(f'{self.NAME} {len(self.data)}')
+        print('=============================')
+
+class BeaverTailsTrain250Dataset(BeaverTailsDataset):
+    NAME: str = 'BeaverTails/train_250'
+    SPLIT: str = '330k_train'
+
+    def __init__(self, path: str | None = None) -> None:
+        self.data = load_dataset('PKU-Alignment/BeaverTails', split=self.SPLIT)
+        self.data = self.data.filter(lambda x: x["is_safe"] == False)
+        self.data = self.data.select(range(250))
 
         print('=============================')
         print(f'{self.NAME} {len(self.data)}')
