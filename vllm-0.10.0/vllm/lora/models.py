@@ -220,6 +220,8 @@ class LoRAModel(AdapterModel):
                     lora_module, weights_mapper)
                 part_name = module_name.split(".")[-1]
                 if part_name not in expected_lora_modules:
+                    if 'lm_head' in module_name or 'embed_tokens' in module_name:
+                        continue
                     unexpected_modules.append(module_name)
             if unexpected_modules:
                 raise ValueError(
@@ -398,6 +400,8 @@ class LoRAModelManager(AdapterModelManager):
                      lora_model.id, index)
         self.lora_index_to_id[index] = lora_model.id
         for module_name, module in self.modules.items():
+            if 'lm_head' in module_name or 'embed_tokens' in module_name:
+                continue
             module_lora = self._get_lora_layer_weights(lora_model, module_name)
             if module_lora:
                 module_lora.optimize()
