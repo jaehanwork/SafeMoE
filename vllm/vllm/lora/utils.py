@@ -147,10 +147,6 @@ def parse_fine_tuned_lora_name(
         new_name = ".".join(parts[start_index:-2])
         return new_name, False, True
 
-    if "lm_head" in parts or "embed_tokens" in parts:
-        new_name = ".".join(parts[start_index:-1])
-        return new_name, False, False
-
     raise ValueError(f"{name} is unsupported LoRA weight")
 
 
