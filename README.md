@@ -95,8 +95,8 @@ Harmfulness score:
 Fine-tuning accuracy:
 ```bash
 ./scripts/eval_Samsum.sh \
-    --model_name_or_path models/sft/OLMoE_Samsum_safemoe \
-    --output_dir results/Samsum/sft/OLMoE_Samsum_safemoe
+    --model_name_or_path models/OLMoE_Samsum_safemoe \
+    --output_dir results/Samsum/OLMoE_Samsum_safemoe
 ```
 
 ---
