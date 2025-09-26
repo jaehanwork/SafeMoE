@@ -1,7 +1,3 @@
-from SafeMoE.trainers.sft_trainer import SFTTrainer
-from SafeMoE.trainers.safe_trainer import SafeTrainer
-from SafeMoE.trainers.safe_trainer_epoch import SafeEpochTrainer
+from SafeMoE.trainers.safemoe_trainer import SafeMoETrainer
 
-__all__ = ['SFTTrainer',
-           'SafeTrainer',
-           'SafeEpochTrainer']
+__all__ = ['SafeMoETrainer']

@@ -14,7 +14,7 @@ from SafeMoE.datasets import parse_dataset, SupervisedDataset
 from SafeMoE.models import load_pretrained_models
 from SafeMoE.models.modeling_deepseek import DeepseekV2ForCausalLM
 from SafeMoE.utils import seed_everything, str2bool, is_main_process
-from SafeMoE.trainers import SafeEpochTrainer
+from SafeMoE.trainers import SafeMoETrainer
 
 import json
 from pdb import set_trace
@@ -333,7 +333,7 @@ def main() -> None:
         save_steps=args.save_steps,
     )
 
-    trainer = SafeEpochTrainer(
+    trainer = SafeMoETrainer(
         model=model,
         args=training_args,
         temp=args.temp,

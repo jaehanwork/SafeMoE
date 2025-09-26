@@ -28,7 +28,6 @@ from SafeMoE.datasets.base import (
     parse_dataset,
 )
 
-from SafeMoE.datasets.preference import *  # noqa: F403
 from SafeMoE.datasets.raw import *  # noqa: F403
 from SafeMoE.datasets.supervised import (
     SupervisedBatch,
@@ -49,7 +48,6 @@ __all__ = [
     'SupervisedCollator',
     'SupervisedSample',
     'SupervisedBatch',
-    *preference.__all__,
 ]
 
 

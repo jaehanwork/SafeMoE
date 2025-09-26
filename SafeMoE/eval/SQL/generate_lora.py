@@ -53,8 +53,8 @@ def main() -> None:
             for prompt, context in zip(batch['question'], batch['context']):
                 messages.append(
                     [
-                        {"role": "system", "content": 'You are a helpful assistant for answering SQL questions. Based on the given Table, generate a SQL for the following question.'},
-                        {"role": "user", "content": f"Question: {prompt}\nTable: {context}"}
+                        {"role": "system", "content": 'You are a helpful assistant for answering SQL questions.'},
+                        {"role": "user", "content": f" Based on the given Table, generate a SQL for the following question.\nQuestion: {prompt}\nTable: {context}"}
                     ]
                 )
 
