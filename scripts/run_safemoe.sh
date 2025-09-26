@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" &>/dev/null && pwd)"
 ROOT_DIR="$(dirname "${SCRIPT_DIR}")"
@@ -9,7 +9,7 @@ MODEL_NAME_OR_PATH=""
 OUTPUT_DIR=""
 TRAIN_DATASETS=()
 ROUTING_LOGITS_SAFE=""
-TEMP=1.0
+TEMP=0.1
 RANK=8
 ALPHA=8
 EPOCHS=3

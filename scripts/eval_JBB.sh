@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
 MODEL_NAME_OR_PATH=""
 OUTPUT_DIR=""
