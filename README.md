@@ -27,10 +27,13 @@ cd SafeMoE
 -->
 
 ### Environment Setup
-
+Instrall conda env and customized vllm (for LoRA support):
 ```bash
 cd SafeMoE
-./install.sh
+conda env create -f environments.yml
+conda activate SafeMoE
+export VLLM_PRECOMPILED_WHEEL_LOCATION=https://vllm-wheels.s3.us-west-2.amazonaws.com/nightly/vllm-0.10.0-cp38-abi3-manylinux1_x86_64.whl
+VLLM_USE_PRECOMPILED=1 pip install -e ./vllm-0.10.0
 ```
 
 ### Authentication (Optional)
@@ -103,7 +106,7 @@ Fine-tuning accuracy:
 Run vanilla fine-tuning:
 
 ```bash
-./scripts/lora_sft.sh \
+./scripts/run_sft.sh \
     --model_name_or_path allenai/OLMoE-1B-7B-0125-Instruct \
     --train_datasets Samsum/train_5k BeaverTails/train_500 \
     --output_dir models/OLMoE_Samsum_ft

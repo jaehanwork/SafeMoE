@@ -196,8 +196,8 @@ def parse_arguments() -> argparse.Namespace:
         '--report_to',
         type=str,
         help='The type of logging.',
-        default='wandb',
-        choices=['wandb', 'tensorboard'],
+        default='none',
+        choices=['none', 'wandb', 'tensorboard'],
     )
     training_parser.add_argument(
         '--save_strategy',
