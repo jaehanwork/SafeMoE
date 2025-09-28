@@ -1,6 +1,7 @@
 from SafeMoE.datasets.base import RawDataset, RawSample
 
 import json
+import os
 
 
 __all__ = ['SafeLLAMADataset', 
@@ -30,13 +31,14 @@ __all__ = ['SafeLLAMADataset',
            'SafeLLAMAInstructionTrain450Dataset',
            'SafeLLAMAInstructionTrain500Dataset']
 
-safe_path = '/root/SafeMoE/SafeMoE/datasets/raw/raw_data/safety_only_data_Instructions.json'
+# Use relative path based on the current file's location
+safe_path = os.path.join(os.path.dirname(__file__), 'raw_data', 'safety_only_data_Instructions.json')
 
 class SafeLLAMADataset(RawDataset):
     NAME: str = 'safe-llama'
 
     def __init__(self, path: str | None = None) -> None:
-        with open('/root/MoEvil/MoEvil/datasets/raw/safety_only_data_Instructions.json', 'r') as f:
+        with open(safe_path, 'r') as f:
             data = json.load(f)
             
         self.data = data

@@ -42,7 +42,8 @@ else:
     model = AutoModel.from_pretrained(model_name, torch_dtype=torch.bfloat16)
 
 
-with open('/root/SafeMoE/SafeMoE/datasets/raw/raw_data/safety_only_data_Instructions.json', 'r') as f:
+data_path = os.path.join(os.path.dirname(__file__), '..', '..', 'datasets', 'raw', 'raw_data', 'safety_only_data_Instructions.json')
+with open(data_path, 'r') as f:
     data_json = json.load(f)[:args.sample_size]
             
 
@@ -75,14 +76,9 @@ def tokenize(batch):
     
     return tokenizer(formatted, padding="max_length", truncation=True, max_length=MAX_LENGTH, padding_side="left")
 
-# Apply tokenization
 tokenized = dataset.map(tokenize, batched=True, remove_columns=dataset.column_names)
 tokenized.set_format(type="torch", columns=["input_ids", "attention_mask"])
 
-
-
-
-# Dataloader
 dataloader = DataLoader(tokenized, batch_size=BATCH_SIZE)
 
 mode, dataloader = accelerator.prepare(model, dataloader)
@@ -92,7 +88,6 @@ model.eval()
 
 last_hidden_states = []
 router_logits = []
-directions = []
 with torch.no_grad():
     for batch in tqdm(dataloader):
         input_ids = batch["input_ids"].to(device)
@@ -102,12 +97,6 @@ with torch.no_grad():
 
         last_hidden_states.extend(outputs.last_hidden_state[:, -1].to(torch.float32).detach().cpu().tolist())
 
-        directions_samples = [[] for _ in range(outputs.last_hidden_state.shape[0])]
-        for hidden_state_layer in outputs.hidden_states[1:]:
-            for sample_idx, hidden_state in enumerate(hidden_state_layer.to(torch.float32).detach().cpu()):
-                directions_samples[sample_idx].append(hidden_state[-1].tolist())
-        directions.extend(directions_samples)
-        
         logits_samples = [[] for _ in range(outputs.last_hidden_state.shape[0])]
         for logits_layer in outputs.router_logits:
             for sample_idx, logits_sample in enumerate(logits_layer.to(torch.float32).detach().cpu().split(MAX_LENGTH, dim=0)):
@@ -118,10 +107,5 @@ with torch.no_grad():
 save_path = os.path.join(output_dir, f"router_logits.json")
 with open(save_path, "w") as f:
     json.dump(router_logits, f)
-
-
-save_path = os.path.join(output_dir, f"directions.json")
-with open(save_path, "w") as f:
-    json.dump(directions, f)
 
 print(f"============= Results saved to {save_path} =============")
