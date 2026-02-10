@@ -25,7 +25,6 @@ cd SafeMoE
 ### Environment Setup
 Instrall conda env and customized vllm (for LoRA support):
 ```bash
-cd SafeMoE
 conda env create -f environments.yml
 conda activate SafeMoE
 export VLLM_PRECOMPILED_WHEEL_LOCATION=https://vllm-wheels.s3.us-west-2.amazonaws.com/nightly/vllm-0.10.0-cp38-abi3-manylinux1_x86_64.whl
