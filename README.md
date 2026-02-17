@@ -3,7 +3,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-This repository contains the official implementation of [*SafeMoE: Safe Fine-Tuning for MoE LLMs by Aligning Harmful Input Routing*](https://openreview.net/pdf?id=W1x9AzkSnU), published in ICLR 2026.
+This repository contains the official implementation of [*SafeMoE: Safe Fine-Tuning for MoE LLMs by Aligning Harmful Input Routing*](https://openreview.net/pdf?id=W1x9AzkSnU), published as a conference paper at ICLR 2026.
 
 >Built upon [Safe-RLHF](https://github.com/PKU-Alignment/safe-rlhf/tree/main)
 
